@@ -78,7 +78,7 @@ class Program
             B asB = oneOf; // Runtime error!
             Console.WriteLine($"OneOf as B: Y = {asB.Y}, Z = {asB.Z}");
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidCastException ex)
         {
             Console.WriteLine($"Expected error: {ex.Message}");
         }
@@ -97,7 +97,7 @@ class Program
             A newAsA = oneOf; // Runtime error!
             Console.WriteLine($"OneOf as A: X = {newAsA.X}, Y = {newAsA.Y}");
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidCastException ex)
         {
             Console.WriteLine($"Expected error: {ex.Message}");
         }

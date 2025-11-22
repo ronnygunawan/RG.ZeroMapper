@@ -300,7 +300,7 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine($"{indent}    public static implicit operator {typeName}({classInfo.ClassSymbol.Name} value)");
             sb.AppendLine($"{indent}    {{");
             sb.AppendLine($"{indent}        if (value._discriminator != {i})");
-            sb.AppendLine($"{indent}            throw new System.InvalidOperationException($\"Cannot convert to {typeName}. Current type is {{value._discriminator}}\");");
+            sb.AppendLine($"{indent}            throw new System.InvalidCastException($\"Cannot convert to {typeName}. Current type is {{value._discriminator}}\");");
             sb.AppendLine($"{indent}        return ({typeName})value._value!;");
             sb.AppendLine($"{indent}    }}");
             sb.AppendLine();

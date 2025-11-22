@@ -218,7 +218,7 @@ public class OneOfTests
         TestOneOf oneOf = typeA;
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() =>
+        Should.Throw<InvalidCastException>(() =>
         {
             TypeB result = oneOf; // This should throw
         });
