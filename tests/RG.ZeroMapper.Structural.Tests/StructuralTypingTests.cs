@@ -42,6 +42,32 @@ public class IntersectTests
         // Assert
         intersection.Common.ShouldBe("shared");
     }
+
+    [Fact]
+    public void Intersect_ShouldAllowImplicitConversionFromFirstType()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 10, Y = 42 };
+
+        // Act
+        TestIntersection intersection = typeA; // Implicit conversion
+
+        // Assert
+        intersection.Y.ShouldBe(42);
+    }
+
+    [Fact]
+    public void Intersect_ShouldAllowImplicitConversionFromSecondType()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 99, Z = 5 };
+
+        // Act
+        TestIntersection intersection = typeB; // Implicit conversion
+
+        // Assert
+        intersection.Y.ShouldBe(99);
+    }
 }
 
 public class UnionTests
@@ -94,6 +120,34 @@ public class UnionTests
         union.Age.ShouldBe(25);
         union.Active.ShouldBe(true);
     }
+
+    [Fact]
+    public void Union_ShouldAllowImplicitConversionToFirstType()
+    {
+        // Arrange
+        var union = new TestUnion { X = 1, Y = 2, Z = 3 };
+
+        // Act
+        TypeA asA = union; // Implicit conversion
+
+        // Assert
+        asA.X.ShouldBe(1);
+        asA.Y.ShouldBe(2);
+    }
+
+    [Fact]
+    public void Union_ShouldAllowImplicitConversionToSecondType()
+    {
+        // Arrange
+        var union = new TestUnion { X = 1, Y = 2, Z = 3 };
+
+        // Act
+        TypeB asB = union; // Implicit conversion
+
+        // Assert
+        asB.Y.ShouldBe(2);
+        asB.Z.ShouldBe(3);
+    }
 }
 
 public class OneOfTests
@@ -119,7 +173,7 @@ public class OneOfTests
         TestOneOf oneOf = typeA;
 
         // Act
-        var result = (TypeA?)oneOf;
+        TypeA result = oneOf; // Implicit conversion
 
         // Assert
         result.ShouldNotBeNull();
@@ -148,7 +202,7 @@ public class OneOfTests
         TestOneOf oneOf = typeB;
 
         // Act
-        var result = (TypeB?)oneOf;
+        TypeB result = oneOf; // Implicit conversion
 
         // Assert
         result.ShouldNotBeNull();
@@ -157,17 +211,33 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_ShouldReturnNullForWrongType()
+    public void OneOf_ShouldThrowExceptionForWrongType()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() =>
+        {
+            TypeB result = oneOf; // This should throw
+        });
+    }
+
+    [Fact]
+    public void OneOf_ShouldAllowReassignment()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf oneOf = typeA;
 
         // Act
-        var result = (TypeB?)oneOf;
+        oneOf = new TypeB { Y = 300, Z = 400 }; // Reassign with different type
+        TypeB result = oneOf; // Should work now
 
         // Assert
-        result.ShouldBeNull();
+        result.Y.ShouldBe(300);
+        result.Z.ShouldBe(400);
     }
 }
 

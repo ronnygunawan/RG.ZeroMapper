@@ -121,6 +121,28 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine($"{indent}    public {typeName} {member.Name} {{ get; set; }}");
         }
 
+        sb.AppendLine();
+
+        // Generate implicit conversion operators FROM each type argument TO intersection
+        // Intersection: T1 & T2 means you can pass T1 or T2 where Intersect<T1, T2> is expected
+        foreach (var typeArg in typeArguments)
+        {
+            var typeName = typeArg.ToDisplayString();
+            sb.AppendLine($"{indent}    public static implicit operator {classInfo.ClassSymbol.Name}({typeName} source)");
+            sb.AppendLine($"{indent}    {{");
+            sb.AppendLine($"{indent}        var result = new {classInfo.ClassSymbol.Name}();");
+            
+            // Copy common properties
+            foreach (var member in commonMembers)
+            {
+                sb.AppendLine($"{indent}        result.{member.Name} = source.{member.Name};");
+            }
+            
+            sb.AppendLine($"{indent}        return result;");
+            sb.AppendLine($"{indent}    }}");
+            sb.AppendLine();
+        }
+
         sb.AppendLine($"{indent}}}");
 
         if (namespaceName != null)
@@ -166,6 +188,36 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine($"{indent}    public {typeName}? {member.Name} {{ get; set; }}");
         }
 
+        sb.AppendLine();
+
+        // Generate implicit conversion operators FROM union TO each type argument
+        // Union: T1 | T2 means you can pass Union<T1, T2> where T1 or T2 is expected
+        foreach (var typeArg in typeArguments)
+        {
+            if (IsConstantType(typeArg))
+                continue;
+
+            var typeName = typeArg.ToDisplayString();
+            var typeMembers = GetMembersFromType(typeArg).ToList();
+            
+            sb.AppendLine($"{indent}    public static implicit operator {typeName}({classInfo.ClassSymbol.Name} source)");
+            sb.AppendLine($"{indent}    {{");
+            sb.AppendLine($"{indent}        var result = new {typeName}();");
+            
+            // Copy properties that exist in the target type
+            foreach (var typeMember in typeMembers)
+            {
+                if (allMembers.Any(m => string.Equals(m.Name, typeMember.Name, System.StringComparison.OrdinalIgnoreCase)))
+                {
+                    sb.AppendLine($"{indent}        result.{typeMember.Name} = source.{typeMember.Name} ?? default!;");
+                }
+            }
+            
+            sb.AppendLine($"{indent}        return result;");
+            sb.AppendLine($"{indent}    }}");
+            sb.AppendLine();
+        }
+
         // Handle constant values
         var constants = GetConstantValues(typeArguments);
         if (constants.Count > 0)
@@ -176,7 +228,6 @@ public class StructuralTypingGenerator : IIncrementalGenerator
                 var constType = constant.Type.ToDisplayString();
                 var constValue = constant.Value;
                 
-                sb.AppendLine();
                 sb.AppendLine($"{indent}    public static implicit operator {classInfo.ClassSymbol.Name}({constType} value)");
                 sb.AppendLine($"{indent}    {{");
                 sb.AppendLine($"{indent}        if (!Equals(value, {constValue}))");
@@ -229,7 +280,7 @@ public class StructuralTypingGenerator : IIncrementalGenerator
 
         // Store the value and discriminator
         sb.AppendLine($"{indent}    private object? _value;");
-        sb.AppendLine($"{indent}    private int _discriminator;");
+        sb.AppendLine($"{indent}    private int _discriminator = -1;");
         sb.AppendLine();
 
         // Generate conversion operators for each type
@@ -238,17 +289,19 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             var typeArg = typeArguments[i];
             var typeName = typeArg.ToDisplayString();
             
-            // From type to OneOf
+            // From type to OneOf (implicit)
             sb.AppendLine($"{indent}    public static implicit operator {classInfo.ClassSymbol.Name}({typeName} value)");
             sb.AppendLine($"{indent}    {{");
             sb.AppendLine($"{indent}        return new {classInfo.ClassSymbol.Name} {{ _value = value, _discriminator = {i} }};");
             sb.AppendLine($"{indent}    }}");
             sb.AppendLine();
 
-            // From OneOf to type (nullable)
-            sb.AppendLine($"{indent}    public static explicit operator {typeName}?({classInfo.ClassSymbol.Name} value)");
+            // From OneOf to type (implicit with runtime check)
+            sb.AppendLine($"{indent}    public static implicit operator {typeName}({classInfo.ClassSymbol.Name} value)");
             sb.AppendLine($"{indent}    {{");
-            sb.AppendLine($"{indent}        return value._discriminator == {i} ? ({typeName}?)value._value : default;");
+            sb.AppendLine($"{indent}        if (value._discriminator != {i})");
+            sb.AppendLine($"{indent}            throw new System.InvalidOperationException($\"Cannot convert to {typeName}. Current type is {{value._discriminator}}\");");
+            sb.AppendLine($"{indent}        return ({typeName})value._value!;");
             sb.AppendLine($"{indent}    }}");
             sb.AppendLine();
         }
