@@ -219,8 +219,8 @@ public class ZeroMapperGenerator : IIncrementalGenerator
 
         foreach (var pair in mappablePairs)
         {
-            var sourceAccess = pair.Source.IsField ? $"source.{pair.Source.Name}" : $"source.{pair.Source.Name}";
-            var targetAccess = pair.Target.IsField ? $"target.{pair.Target.Name}" : $"target.{pair.Target.Name}";
+            var sourceAccess = $"source.{pair.Source.Name}";
+            var targetAccess = $"target.{pair.Target.Name}";
             
             sb.AppendLine($"{indent}    {targetAccess} = {sourceAccess};");
         }
