@@ -131,6 +131,15 @@ public class ZeroMapperGenerator : IIncrementalGenerator
             if (SymbolEqualityComparer.Default.Equals(sourceClass, targetClass))
                 continue;
 
+            // Skip non-public classes
+            if (sourceClass.DeclaredAccessibility != Accessibility.Public &&
+                sourceClass.DeclaredAccessibility != Accessibility.Internal)
+                continue;
+
+            // Skip classes from different assemblies (only map within same assembly)
+            if (!SymbolEqualityComparer.Default.Equals(sourceClass.ContainingAssembly, targetClass.ContainingAssembly))
+                continue;
+
             var sourceMembers = GetMappableMembers(sourceClass);
             
             // Check if we can map from source to target
@@ -184,10 +193,10 @@ public class ZeroMapperGenerator : IIncrementalGenerator
         {
             foreach (var source in sourceMembers)
             {
-                // Case-insensitive name matching
-                if (string.Equals(source.Name, target.Name, System.StringComparison.OrdinalIgnoreCase))
+                // Case-insensitive name matching and type compatibility check
+                if (string.Equals(source.Name, target.Name, System.StringComparison.OrdinalIgnoreCase) &&
+                    SymbolEqualityComparer.Default.Equals(source.Type, target.Type))
                 {
-                    // Check type compatibility (exact match or implicit conversion exists)
                     pairs.Add(new MemberPair(source, target));
                     break;
                 }
