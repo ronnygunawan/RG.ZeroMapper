@@ -1,5 +1,7 @@
 # RG.ZeroMapper
 
+[![NuGet](https://img.shields.io/nuget/v/RG.ZeroMapper.svg)](https://www.nuget.org/packages/RG.ZeroMapper/)
+
 `RG.ZeroMapper` is a Zero boilerplate (kind of) C# object mapper.
 
 ```cs
@@ -24,6 +26,8 @@ partial class Bar {
 ```
 
 # RG.ZeroMapper.Structural
+
+[![NuGet](https://img.shields.io/nuget/v/RG.ZeroMapper.Structural.svg)](https://www.nuget.org/packages/RG.ZeroMapper.Structural/)
 
 `RG.ZeroMapper.Structural` leverages `RG.ZeroMapper` to enable structural typing in your C# code:
 
