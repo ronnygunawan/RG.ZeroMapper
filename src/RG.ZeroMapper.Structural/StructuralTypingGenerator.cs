@@ -306,6 +306,107 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine();
         }
 
+        // Generate As<T>() generic method
+        sb.AppendLine($"{indent}    public T? As<T>()");
+        sb.AppendLine($"{indent}    {{");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            
+            if (i == 0)
+            {
+                sb.AppendLine($"{indent}        if (typeof(T) == typeof({typeName}))");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        else if (typeof(T) == typeof({typeName}))");
+            }
+            sb.AppendLine($"{indent}        {{");
+            sb.AppendLine($"{indent}            return _discriminator == {i} ? (T)(object)({typeName})_value! : default(T);");
+            sb.AppendLine($"{indent}        }}");
+        }
+        sb.AppendLine($"{indent}        return default(T);");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+
+        // Generate TryCast<T>() generic method
+        sb.AppendLine($"{indent}    public bool TryCast<T>([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out T? value)");
+        sb.AppendLine($"{indent}    {{");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            
+            if (i == 0)
+            {
+                sb.AppendLine($"{indent}        if (typeof(T) == typeof({typeName}))");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        else if (typeof(T) == typeof({typeName}))");
+            }
+            sb.AppendLine($"{indent}        {{");
+            sb.AppendLine($"{indent}            if (_discriminator == {i})");
+            sb.AppendLine($"{indent}            {{");
+            sb.AppendLine($"{indent}                value = (T)(object)({typeName})_value!;");
+            sb.AppendLine($"{indent}                return true;");
+            sb.AppendLine($"{indent}            }}");
+            sb.AppendLine($"{indent}        }}");
+        }
+        sb.AppendLine($"{indent}        value = default(T);");
+        sb.AppendLine($"{indent}        return false;");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+
+        // Generate Switch method (void return)
+        sb.Append($"{indent}    public void Switch(");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            if (i > 0) sb.Append(", ");
+            sb.Append($"System.Action<{typeName}> case{i + 1}");
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        switch (_discriminator)");
+        sb.AppendLine($"{indent}        {{");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            sb.AppendLine($"{indent}            case {i}:");
+            sb.AppendLine($"{indent}                case{i + 1}(({typeName})_value!);");
+            sb.AppendLine($"{indent}                break;");
+        }
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+
+        // Generate Switch<R> method (with return value)
+        sb.Append($"{indent}    public R Switch<R>(");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            if (i > 0) sb.Append(", ");
+            sb.Append($"System.Func<{typeName}, R> case{i + 1}");
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        return _discriminator switch");
+        sb.AppendLine($"{indent}        {{");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            sb.AppendLine($"{indent}            {i} => case{i + 1}(({typeName})_value!),");
+        }
+        sb.AppendLine($"{indent}            _ => throw new System.InvalidOperationException(\"OneOf is in an invalid state\")");
+        sb.AppendLine($"{indent}        }};");
+        sb.AppendLine($"{indent}    }}");
+
         sb.AppendLine($"{indent}}}");
 
         if (namespaceName != null)
@@ -411,6 +512,30 @@ public class StructuralTypingGenerator : IIncrementalGenerator
                 yield return new MemberData(property.Name, property.Type);
             }
         }
+    }
+
+    private static string GetTypeArgumentName(int index)
+    {
+        return index switch
+        {
+            1 => "T1",
+            2 => "T2",
+            3 => "T3",
+            4 => "T4",
+            5 => "T5",
+            6 => "T6",
+            7 => "T7",
+            8 => "T8",
+            9 => "T9",
+            10 => "T10",
+            11 => "T11",
+            12 => "T12",
+            13 => "T13",
+            14 => "T14",
+            15 => "T15",
+            16 => "T16",
+            _ => $"T{index}"
+        };
     }
 
     private class ClassInfo
