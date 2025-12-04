@@ -306,37 +306,58 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine();
         }
 
-        // Generate As<T>() method
+        // Generate As<T>() generic method
+        sb.AppendLine($"{indent}    public T? As<T>()");
+        sb.AppendLine($"{indent}    {{");
         for (int i = 0; i < typeArguments.Length; i++)
         {
             var typeArg = typeArguments[i];
             var typeName = typeArg.ToDisplayString();
             
-            sb.AppendLine($"{indent}    public {typeName}? As{GetTypeArgumentName(i + 1)}()");
-            sb.AppendLine($"{indent}    {{");
-            sb.AppendLine($"{indent}        return _discriminator == {i} ? ({typeName})_value! : null;");
-            sb.AppendLine($"{indent}    }}");
-            sb.AppendLine();
-        }
-
-        // Generate TryCast<T>() method
-        for (int i = 0; i < typeArguments.Length; i++)
-        {
-            var typeArg = typeArguments[i];
-            var typeName = typeArg.ToDisplayString();
-            
-            sb.AppendLine($"{indent}    public bool TryCast{GetTypeArgumentName(i + 1)}([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out {typeName}? value)");
-            sb.AppendLine($"{indent}    {{");
-            sb.AppendLine($"{indent}        if (_discriminator == {i})");
+            if (i == 0)
+            {
+                sb.AppendLine($"{indent}        if (typeof(T) == typeof({typeName}))");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        else if (typeof(T) == typeof({typeName}))");
+            }
             sb.AppendLine($"{indent}        {{");
-            sb.AppendLine($"{indent}            value = ({typeName})_value!;");
-            sb.AppendLine($"{indent}            return true;");
+            sb.AppendLine($"{indent}            return _discriminator == {i} ? (T)(object)({typeName})_value! : default(T);");
             sb.AppendLine($"{indent}        }}");
-            sb.AppendLine($"{indent}        value = null;");
-            sb.AppendLine($"{indent}        return false;");
-            sb.AppendLine($"{indent}    }}");
-            sb.AppendLine();
         }
+        sb.AppendLine($"{indent}        return default(T);");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+
+        // Generate TryCast<T>() generic method
+        sb.AppendLine($"{indent}    public bool TryCast<T>([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out T? value)");
+        sb.AppendLine($"{indent}    {{");
+        for (int i = 0; i < typeArguments.Length; i++)
+        {
+            var typeArg = typeArguments[i];
+            var typeName = typeArg.ToDisplayString();
+            
+            if (i == 0)
+            {
+                sb.AppendLine($"{indent}        if (typeof(T) == typeof({typeName}))");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        else if (typeof(T) == typeof({typeName}))");
+            }
+            sb.AppendLine($"{indent}        {{");
+            sb.AppendLine($"{indent}            if (_discriminator == {i})");
+            sb.AppendLine($"{indent}            {{");
+            sb.AppendLine($"{indent}                value = (T)(object)({typeName})_value!;");
+            sb.AppendLine($"{indent}                return true;");
+            sb.AppendLine($"{indent}            }}");
+            sb.AppendLine($"{indent}        }}");
+        }
+        sb.AppendLine($"{indent}        value = default(T);");
+        sb.AppendLine($"{indent}        return false;");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
 
         // Generate Switch method (void return)
         sb.Append($"{indent}    public void Switch(");

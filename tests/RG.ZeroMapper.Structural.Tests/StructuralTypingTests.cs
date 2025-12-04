@@ -241,14 +241,14 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_AsT1_ShouldReturnValueWhenHoldingT1()
+    public void OneOf_As_ShouldReturnValueWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf oneOf = typeA;
 
         // Act
-        var result = oneOf.AsT1();
+        var result = oneOf.As<TypeA>();
 
         // Assert
         result.ShouldNotBeNull();
@@ -257,28 +257,28 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_AsT1_ShouldReturnNullWhenHoldingT2()
+    public void OneOf_As_ShouldReturnNullWhenHoldingT2()
     {
         // Arrange
         var typeB = new TypeB { Y = 300, Z = 400 };
         TestOneOf oneOf = typeB;
 
         // Act
-        var result = oneOf.AsT1();
+        var result = oneOf.As<TypeA>();
 
         // Assert
         result.ShouldBeNull();
     }
 
     [Fact]
-    public void OneOf_AsT2_ShouldReturnValueWhenHoldingT2()
+    public void OneOf_As_ShouldReturnValueWhenHoldingT2()
     {
         // Arrange
         var typeB = new TypeB { Y = 300, Z = 400 };
         TestOneOf oneOf = typeB;
 
         // Act
-        var result = oneOf.AsT2();
+        var result = oneOf.As<TypeB>();
 
         // Assert
         result.ShouldNotBeNull();
@@ -287,28 +287,28 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_AsT2_ShouldReturnNullWhenHoldingT1()
+    public void OneOf_As_ShouldReturnNullWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf oneOf = typeA;
 
         // Act
-        var result = oneOf.AsT2();
+        var result = oneOf.As<TypeB>();
 
         // Assert
         result.ShouldBeNull();
     }
 
     [Fact]
-    public void OneOf_TryCastT1_ShouldReturnTrueWhenHoldingT1()
+    public void OneOf_TryCast_ShouldReturnTrueWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf oneOf = typeA;
 
         // Act
-        var success = oneOf.TryCastT1(out var result);
+        var success = oneOf.TryCast<TypeA>(out var result);
 
         // Assert
         success.ShouldBeTrue();
@@ -318,14 +318,14 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_TryCastT1_ShouldReturnFalseWhenHoldingT2()
+    public void OneOf_TryCast_ShouldReturnFalseWhenHoldingT2()
     {
         // Arrange
         var typeB = new TypeB { Y = 300, Z = 400 };
         TestOneOf oneOf = typeB;
 
         // Act
-        var success = oneOf.TryCastT1(out var result);
+        var success = oneOf.TryCast<TypeA>(out var result);
 
         // Assert
         success.ShouldBeFalse();
@@ -333,14 +333,14 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_TryCastT2_ShouldReturnTrueWhenHoldingT2()
+    public void OneOf_TryCast_ShouldReturnTrueWhenHoldingT2()
     {
         // Arrange
         var typeB = new TypeB { Y = 300, Z = 400 };
         TestOneOf oneOf = typeB;
 
         // Act
-        var success = oneOf.TryCastT2(out var result);
+        var success = oneOf.TryCast<TypeB>(out var result);
 
         // Assert
         success.ShouldBeTrue();
@@ -350,14 +350,14 @@ public class OneOfTests
     }
 
     [Fact]
-    public void OneOf_TryCastT2_ShouldReturnFalseWhenHoldingT1()
+    public void OneOf_TryCast_ShouldReturnFalseWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf oneOf = typeA;
 
         // Act
-        var success = oneOf.TryCastT2(out var result);
+        var success = oneOf.TryCast<TypeB>(out var result);
 
         // Assert
         success.ShouldBeFalse();
@@ -540,14 +540,14 @@ public class OneOf3Tests
     }
 
     [Fact]
-    public void OneOf3_AsT3_ShouldReturnValueWhenHoldingT3()
+    public void OneOf3_As_ShouldReturnValueWhenHoldingT3()
     {
         // Arrange
         var typeC = new TypeC { Name = "Test", Value = 3.14 };
         TestOneOf3 oneOf = typeC;
 
         // Act
-        var result = oneOf.AsT3();
+        var result = oneOf.As<TypeC>();
 
         // Assert
         result.ShouldNotBeNull();
@@ -556,28 +556,28 @@ public class OneOf3Tests
     }
 
     [Fact]
-    public void OneOf3_AsT3_ShouldReturnNullWhenHoldingT1()
+    public void OneOf3_As_ShouldReturnNullWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf3 oneOf = typeA;
 
         // Act
-        var result = oneOf.AsT3();
+        var result = oneOf.As<TypeC>();
 
         // Assert
         result.ShouldBeNull();
     }
 
     [Fact]
-    public void OneOf3_TryCastT3_ShouldReturnTrueWhenHoldingT3()
+    public void OneOf3_TryCast_ShouldReturnTrueWhenHoldingT3()
     {
         // Arrange
         var typeC = new TypeC { Name = "Test", Value = 3.14 };
         TestOneOf3 oneOf = typeC;
 
         // Act
-        var success = oneOf.TryCastT3(out var result);
+        var success = oneOf.TryCast<TypeC>(out var result);
 
         // Assert
         success.ShouldBeTrue();
@@ -587,14 +587,14 @@ public class OneOf3Tests
     }
 
     [Fact]
-    public void OneOf3_TryCastT3_ShouldReturnFalseWhenHoldingT1()
+    public void OneOf3_TryCast_ShouldReturnFalseWhenHoldingT1()
     {
         // Arrange
         var typeA = new TypeA { X = 100, Y = 200 };
         TestOneOf3 oneOf = typeA;
 
         // Act
-        var success = oneOf.TryCastT3(out var result);
+        var success = oneOf.TryCast<TypeC>(out var result);
 
         // Assert
         success.ShouldBeFalse();
