@@ -11,6 +11,9 @@ public class StructuralTypingGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Generate support types (Constant, Intersect, Union, OneOf) once per compilation
+        context.RegisterPostInitializationOutput(ctx => GenerateSupportTypes(ctx));
+
         // Find all partial classes that inherit from Intersect, Union, or OneOf
         var structuralClasses = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -574,5 +577,97 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             Type = type;
             Value = value;
         }
+    }
+
+    private static void GenerateSupportTypes(IncrementalGeneratorPostInitializationContext context)
+    {
+        // Generate Constant.cs
+        context.AddSource("RG.ZeroMapper.Structural.Constant.g.cs", @"namespace RG.ZeroMapper.Structural;
+
+/// <summary>
+/// Base class for constant values in structural types.
+/// </summary>
+public abstract class Constant
+{
+    public object Value { get; }
+    
+    protected Constant(object value)
+    {
+        Value = value;
+    }
+}
+");
+
+        // Generate Intersect.cs
+        var intersectCode = new StringBuilder();
+        intersectCode.AppendLine("namespace RG.ZeroMapper.Structural;");
+        intersectCode.AppendLine();
+        
+        for (int i = 1; i <= 16; i++)
+        {
+            intersectCode.AppendLine("/// <summary>");
+            intersectCode.AppendLine("/// Base class for intersection types. An intersection type contains properties that exist in all generic type arguments.");
+            intersectCode.AppendLine("/// </summary>");
+            intersectCode.Append("public abstract class Intersect<");
+            for (int j = 1; j <= i; j++)
+            {
+                if (j > 1) intersectCode.Append(", ");
+                intersectCode.Append($"T{j}");
+            }
+            intersectCode.AppendLine(">");
+            intersectCode.AppendLine("{");
+            intersectCode.AppendLine("}");
+            intersectCode.AppendLine();
+        }
+        
+        context.AddSource("RG.ZeroMapper.Structural.Intersect.g.cs", intersectCode.ToString());
+
+        // Generate Union.cs
+        var unionCode = new StringBuilder();
+        unionCode.AppendLine("namespace RG.ZeroMapper.Structural;");
+        unionCode.AppendLine();
+        
+        for (int i = 1; i <= 16; i++)
+        {
+            unionCode.AppendLine("/// <summary>");
+            unionCode.AppendLine("/// Base class for union types. A union type contains all properties from all generic type arguments.");
+            unionCode.AppendLine("/// </summary>");
+            unionCode.Append("public abstract class Union<");
+            for (int j = 1; j <= i; j++)
+            {
+                if (j > 1) unionCode.Append(", ");
+                unionCode.Append($"T{j}");
+            }
+            unionCode.AppendLine(">");
+            unionCode.AppendLine("{");
+            unionCode.AppendLine("}");
+            unionCode.AppendLine();
+        }
+        
+        context.AddSource("RG.ZeroMapper.Structural.Union.g.cs", unionCode.ToString());
+
+        // Generate OneOf.cs
+        var oneOfCode = new StringBuilder();
+        oneOfCode.AppendLine("namespace RG.ZeroMapper.Structural;");
+        oneOfCode.AppendLine();
+        
+        for (int i = 1; i <= 16; i++)
+        {
+            oneOfCode.AppendLine("/// <summary>");
+            oneOfCode.AppendLine("/// Base class for discriminated union types. A OneOf type can hold a value of any of the generic type arguments.");
+            oneOfCode.AppendLine("/// </summary>");
+            oneOfCode.Append("public abstract class OneOf<");
+            for (int j = 1; j <= i; j++)
+            {
+                if (j > 1) oneOfCode.Append(", ");
+                oneOfCode.Append($"T{j}");
+            }
+            oneOfCode.AppendLine(">");
+            oneOfCode.AppendLine("{");
+            oneOfCode.AppendLine("}");
+            oneOfCode.AppendLine();
+        }
+        
+        context.AddSource("RG.ZeroMapper.Structural.OneOf.g.cs", oneOfCode.ToString());
     }
 }
