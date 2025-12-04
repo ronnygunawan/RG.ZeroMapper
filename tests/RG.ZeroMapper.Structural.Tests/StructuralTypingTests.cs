@@ -496,6 +496,112 @@ public class OneOfTests
     }
 }
 
+public class OneOf3Tests
+{
+    [Fact]
+    public void OneOf3_Switch_ShouldExecuteCase3WhenHoldingT3()
+    {
+        // Arrange
+        var typeC = new TypeC { Name = "Test", Value = 3.14 };
+        TestOneOf3 oneOf = typeC;
+        var case1Executed = false;
+        var case2Executed = false;
+        var case3Executed = false;
+
+        // Act
+        oneOf.Switch(
+            a => case1Executed = true,
+            b => case2Executed = true,
+            c => case3Executed = true
+        );
+
+        // Assert
+        case1Executed.ShouldBeFalse();
+        case2Executed.ShouldBeFalse();
+        case3Executed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void OneOf3_SwitchWithReturn_ShouldReturnCase3ResultWhenHoldingT3()
+    {
+        // Arrange
+        var typeC = new TypeC { Name = "Test", Value = 3.14 };
+        TestOneOf3 oneOf = typeC;
+
+        // Act
+        var result = oneOf.Switch(
+            a => $"TypeA: {a.X}",
+            b => $"TypeB: {b.Z}",
+            c => $"TypeC: {c.Name}"
+        );
+
+        // Assert
+        result.ShouldBe("TypeC: Test");
+    }
+
+    [Fact]
+    public void OneOf3_AsT3_ShouldReturnValueWhenHoldingT3()
+    {
+        // Arrange
+        var typeC = new TypeC { Name = "Test", Value = 3.14 };
+        TestOneOf3 oneOf = typeC;
+
+        // Act
+        var result = oneOf.AsT3();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe("Test");
+        result.Value.ShouldBe(3.14);
+    }
+
+    [Fact]
+    public void OneOf3_AsT3_ShouldReturnNullWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf3 oneOf = typeA;
+
+        // Act
+        var result = oneOf.AsT3();
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public void OneOf3_TryCastT3_ShouldReturnTrueWhenHoldingT3()
+    {
+        // Arrange
+        var typeC = new TypeC { Name = "Test", Value = 3.14 };
+        TestOneOf3 oneOf = typeC;
+
+        // Act
+        var success = oneOf.TryCastT3(out var result);
+
+        // Assert
+        success.ShouldBeTrue();
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe("Test");
+        result.Value.ShouldBe(3.14);
+    }
+
+    [Fact]
+    public void OneOf3_TryCastT3_ShouldReturnFalseWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf3 oneOf = typeA;
+
+        // Act
+        var success = oneOf.TryCastT3(out var result);
+
+        // Assert
+        success.ShouldBeFalse();
+        result.ShouldBeNull();
+    }
+}
+
 // Test types for Intersect
 class TypeA
 {
@@ -538,6 +644,12 @@ class StatusType
     public bool Active { get; set; }
 }
 
+class TypeC
+{
+    public string Name { get; set; } = string.Empty;
+    public double Value { get; set; }
+}
+
 partial class TestIntersection : Intersect<TypeA, TypeB>
 {
     // Should only contain Y property (common to both TypeA and TypeB)
@@ -561,4 +673,9 @@ partial class MultiTypeUnion : Union<PersonType, StatusType>
 partial class TestOneOf : OneOf<TypeA, TypeB>
 {
     // Discriminated union that can hold either TypeA or TypeB
+}
+
+partial class TestOneOf3 : OneOf<TypeA, TypeB, TypeC>
+{
+    // Discriminated union that can hold TypeA, TypeB, or TypeC
 }
