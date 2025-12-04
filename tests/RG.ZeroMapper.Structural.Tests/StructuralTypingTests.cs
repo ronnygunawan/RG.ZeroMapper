@@ -239,6 +239,261 @@ public class OneOfTests
         result.Y.ShouldBe(300);
         result.Z.ShouldBe(400);
     }
+
+    [Fact]
+    public void OneOf_AsT1_ShouldReturnValueWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var result = oneOf.AsT1();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.X.ShouldBe(100);
+        result.Y.ShouldBe(200);
+    }
+
+    [Fact]
+    public void OneOf_AsT1_ShouldReturnNullWhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+
+        // Act
+        var result = oneOf.AsT1();
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public void OneOf_AsT2_ShouldReturnValueWhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+
+        // Act
+        var result = oneOf.AsT2();
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Y.ShouldBe(300);
+        result.Z.ShouldBe(400);
+    }
+
+    [Fact]
+    public void OneOf_AsT2_ShouldReturnNullWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var result = oneOf.AsT2();
+
+        // Assert
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public void OneOf_TryCastT1_ShouldReturnTrueWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var success = oneOf.TryCastT1(out var result);
+
+        // Assert
+        success.ShouldBeTrue();
+        result.ShouldNotBeNull();
+        result.X.ShouldBe(100);
+        result.Y.ShouldBe(200);
+    }
+
+    [Fact]
+    public void OneOf_TryCastT1_ShouldReturnFalseWhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+
+        // Act
+        var success = oneOf.TryCastT1(out var result);
+
+        // Assert
+        success.ShouldBeFalse();
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public void OneOf_TryCastT2_ShouldReturnTrueWhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+
+        // Act
+        var success = oneOf.TryCastT2(out var result);
+
+        // Assert
+        success.ShouldBeTrue();
+        result.ShouldNotBeNull();
+        result.Y.ShouldBe(300);
+        result.Z.ShouldBe(400);
+    }
+
+    [Fact]
+    public void OneOf_TryCastT2_ShouldReturnFalseWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var success = oneOf.TryCastT2(out var result);
+
+        // Assert
+        success.ShouldBeFalse();
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public void OneOf_Switch_ShouldExecuteCase1WhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+        var case1Executed = false;
+        var case2Executed = false;
+
+        // Act
+        oneOf.Switch(
+            a => case1Executed = true,
+            b => case2Executed = true
+        );
+
+        // Assert
+        case1Executed.ShouldBeTrue();
+        case2Executed.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void OneOf_Switch_ShouldExecuteCase2WhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+        var case1Executed = false;
+        var case2Executed = false;
+
+        // Act
+        oneOf.Switch(
+            a => case1Executed = true,
+            b => case2Executed = true
+        );
+
+        // Assert
+        case1Executed.ShouldBeFalse();
+        case2Executed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void OneOf_Switch_ShouldPassCorrectValueToCase1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+        TypeA? capturedValue = null;
+
+        // Act
+        oneOf.Switch(
+            a => capturedValue = a,
+            b => { }
+        );
+
+        // Assert
+        capturedValue.ShouldNotBeNull();
+        capturedValue.X.ShouldBe(100);
+        capturedValue.Y.ShouldBe(200);
+    }
+
+    [Fact]
+    public void OneOf_Switch_ShouldPassCorrectValueToCase2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+        TypeB? capturedValue = null;
+
+        // Act
+        oneOf.Switch(
+            a => { },
+            b => capturedValue = b
+        );
+
+        // Assert
+        capturedValue.ShouldNotBeNull();
+        capturedValue.Y.ShouldBe(300);
+        capturedValue.Z.ShouldBe(400);
+    }
+
+    [Fact]
+    public void OneOf_SwitchWithReturn_ShouldReturnCase1ResultWhenHoldingT1()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var result = oneOf.Switch(
+            a => $"TypeA: {a.X}",
+            b => $"TypeB: {b.Z}"
+        );
+
+        // Assert
+        result.ShouldBe("TypeA: 100");
+    }
+
+    [Fact]
+    public void OneOf_SwitchWithReturn_ShouldReturnCase2ResultWhenHoldingT2()
+    {
+        // Arrange
+        var typeB = new TypeB { Y = 300, Z = 400 };
+        TestOneOf oneOf = typeB;
+
+        // Act
+        var result = oneOf.Switch(
+            a => $"TypeA: {a.X}",
+            b => $"TypeB: {b.Z}"
+        );
+
+        // Assert
+        result.ShouldBe("TypeB: 400");
+    }
+
+    [Fact]
+    public void OneOf_SwitchWithReturn_ShouldWorkWithDifferentReturnTypes()
+    {
+        // Arrange
+        var typeA = new TypeA { X = 100, Y = 200 };
+        TestOneOf oneOf = typeA;
+
+        // Act
+        var result = oneOf.Switch<int>(
+            a => a.X + a.Y,
+            b => b.Y + b.Z
+        );
+
+        // Assert
+        result.ShouldBe(300);
+    }
 }
 
 // Test types for Intersect
