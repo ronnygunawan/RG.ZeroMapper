@@ -314,7 +314,7 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             
             sb.AppendLine($"{indent}    public {typeName}? As{GetTypeArgumentName(i + 1)}()");
             sb.AppendLine($"{indent}    {{");
-            sb.AppendLine($"{indent}        return _discriminator == {i} ? ({typeName})_value! : default({typeName});");
+            sb.AppendLine($"{indent}        return _discriminator == {i} ? ({typeName})_value! : null;");
             sb.AppendLine($"{indent}    }}");
             sb.AppendLine();
         }
@@ -332,7 +332,7 @@ public class StructuralTypingGenerator : IIncrementalGenerator
             sb.AppendLine($"{indent}            value = ({typeName})_value!;");
             sb.AppendLine($"{indent}            return true;");
             sb.AppendLine($"{indent}        }}");
-            sb.AppendLine($"{indent}        value = default({typeName});");
+            sb.AppendLine($"{indent}        value = null;");
             sb.AppendLine($"{indent}        return false;");
             sb.AppendLine($"{indent}    }}");
             sb.AppendLine();
