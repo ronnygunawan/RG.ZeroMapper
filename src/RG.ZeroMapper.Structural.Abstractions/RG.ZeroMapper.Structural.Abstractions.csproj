@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Authors>Ronny Gunawan</Authors>
+    <Description>Base types for RG.ZeroMapper.Structural - Structural typing for C#</Description>
+    <Copyright>(C) 2021-2025 Ronny Gunawan</Copyright>
+    <PackageProjectUrl>https://github.com/ronnygunawan/RG.ZeroMapper</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ronnygunawan/RG.ZeroMapper</RepositoryUrl>
+    <PackageTags>structural-typing;base-types</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
