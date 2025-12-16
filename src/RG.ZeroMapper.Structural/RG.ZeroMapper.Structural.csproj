@@ -25,6 +25,11 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- Reference to the Abstractions package that will be included as a dependency -->
+  <ItemGroup>
+    <ProjectReference Include="..\RG.ZeroMapper.Structural.Abstractions\RG.ZeroMapper.Structural.Abstractions.csproj" PrivateAssets="none" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="..\..\README.md">
       <Pack>True</Pack>

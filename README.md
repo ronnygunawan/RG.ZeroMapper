@@ -28,6 +28,7 @@ partial class Bar {
 # RG.ZeroMapper.Structural
 
 [![NuGet](https://img.shields.io/nuget/v/RG.ZeroMapper.Structural.svg)](https://www.nuget.org/packages/RG.ZeroMapper.Structural/)
+[![NuGet](https://img.shields.io/nuget/v/RG.ZeroMapper.Structural.Abstractions.svg)](https://www.nuget.org/packages/RG.ZeroMapper.Structural.Abstractions/)
 
 `RG.ZeroMapper.Structural` leverages `RG.ZeroMapper` to enable structural typing in your C# code:
 
