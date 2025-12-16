@@ -40,6 +40,11 @@ jobs:
         sed -i "s|<Version>.*</Version>|<Version>${{ steps.get_version.outputs.version }}</Version>|g" src/RG.ZeroMapper.Structural/RG.ZeroMapper.Structural.csproj
         cat src/RG.ZeroMapper.Structural/RG.ZeroMapper.Structural.csproj
     
+    - name: Update project version for RG.ZeroMapper.Structural.Abstractions
+      run: |
+        sed -i "s|<Version>.*</Version>|<Version>${{ steps.get_version.outputs.version }}</Version>|g" src/RG.ZeroMapper.Structural.Abstractions/RG.ZeroMapper.Structural.Abstractions.csproj
+        cat src/RG.ZeroMapper.Structural.Abstractions/RG.ZeroMapper.Structural.Abstractions.csproj
+    
     - name: Restore dependencies
       run: dotnet restore
     
