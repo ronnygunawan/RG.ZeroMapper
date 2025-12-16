@@ -29,7 +29,20 @@ partial class Bar {
 
 [![NuGet](https://img.shields.io/nuget/v/RG.ZeroMapper.Structural.svg)](https://www.nuget.org/packages/RG.ZeroMapper.Structural/)
 
-`RG.ZeroMapper.Structural` leverages `RG.ZeroMapper` to enable structural typing in your C# code:
+`RG.ZeroMapper.Structural` leverages `RG.ZeroMapper` to enable structural typing in your C# code.
+
+## Installation
+
+Install both packages via NuGet:
+
+```bash
+dotnet add package RG.ZeroMapper.Structural
+dotnet add package RG.ZeroMapper.Structural.Abstractions
+```
+
+The `RG.ZeroMapper.Structural.Abstractions` package contains the base types (`Constant`, `Intersect<>`, `Union<>`, `OneOf<>`) that are shared across all projects using structural typing. This prevents type conflicts when multiple projects in a solution use the same structural types.
+
+## Usage
 
 ```cs
 class A {
